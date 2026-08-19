@@ -1,0 +1,47 @@
+{
+  gateway: {
+    mode: "local",
+    bind: "loopback",
+  },
+  agents: {
+    defaults: {
+      workspace: "~/.openclaw/workspace",
+      model: "openai/gpt-5.6-sol",
+      models: {
+        "openai/gpt-5.6-sol": {
+          agentRuntime: {
+            id: "codex",
+          },
+        },
+      },
+    },
+  },
+  plugins: {
+    entries: {
+      codex: {
+        enabled: true,
+        config: {
+          discovery: {
+            enabled: true,
+            timeoutMs: 2500,
+          },
+          appServer: {
+            transport: "stdio",
+            homeScope: "user",
+            mode: "guardian",
+            defaultWorkspaceDir: "~/.openclaw/workspace",
+          },
+        },
+      },
+      "ai-sdlc": {
+        enabled: true,
+        config: {
+          postgresUrl: "${AI_SDLC_POSTGRES_URL}",
+          qdrantUrl: "${AI_SDLC_QDRANT_URL}",
+          qdrantApiKey: "${AI_SDLC_QDRANT_API_KEY}",
+          knowledgeCollection: "${AI_SDLC_QDRANT_COLLECTION}",
+        },
+      },
+    },
+  },
+}

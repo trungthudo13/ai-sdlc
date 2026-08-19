@@ -1,0 +1,69 @@
+{
+  "id": "ai-sdlc",
+  "name": "AI SDLC",
+  "description": "Durable typed artifacts, deterministic gates, and semantic knowledge retrieval.",
+  "version": "0.1.0",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "postgresUrl": {
+        "type": "string",
+        "minLength": 1
+      },
+      "qdrantUrl": {
+        "type": "string",
+        "minLength": 1
+      },
+      "qdrantApiKey": {
+        "type": "string",
+        "minLength": 1
+      },
+      "knowledgeCollection": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "additionalProperties": false
+  },
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {
+    "tools": [
+      "ai_sdlc_health",
+      "ai_sdlc_flow_create",
+      "ai_sdlc_artifact_submit",
+      "ai_sdlc_artifact_get",
+      "ai_sdlc_decision_request_submit",
+      "ai_sdlc_finding_submit",
+      "ai_sdlc_gate_check",
+      "ai_sdlc_knowledge_search"
+    ]
+  },
+  "toolMetadata": {
+    "ai_sdlc_health": {
+      "optional": true
+    },
+    "ai_sdlc_flow_create": {
+      "optional": true
+    },
+    "ai_sdlc_artifact_submit": {
+      "optional": true
+    },
+    "ai_sdlc_artifact_get": {
+      "optional": true
+    },
+    "ai_sdlc_decision_request_submit": {
+      "optional": true
+    },
+    "ai_sdlc_finding_submit": {
+      "optional": true
+    },
+    "ai_sdlc_gate_check": {
+      "optional": true
+    },
+    "ai_sdlc_knowledge_search": {
+      "optional": true
+    }
+  }
+}

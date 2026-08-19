@@ -38,6 +38,14 @@ ScaffoldingReadMe.txt
 
 # dotenv environment variables file
 .env
+.env.bak.*
+
+# Local full-stack runtime data and generated secrets
+runtime/
+
+# Node/OpenClaw plugin build output
+node_modules/
+dist/
 
 # Others
 ~$*

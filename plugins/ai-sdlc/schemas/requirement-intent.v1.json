@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ai-sdlc.requirement-intent.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "featureId", "intent"],
+  "properties": {
+    "schema": { "const": "ai-sdlc.requirement-intent.v1" },
+    "featureId": { "type": "string", "minLength": 1 },
+    "intent": { "type": "string", "minLength": 1 },
+    "sourceRefs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "constraints": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

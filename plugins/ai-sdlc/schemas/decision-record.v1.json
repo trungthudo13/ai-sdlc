@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ai-sdlc.decision-record.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "featureId", "decisionId", "selectedOption", "approvedBy"],
+  "properties": {
+    "schema": { "const": "ai-sdlc.decision-record.v1" },
+    "featureId": { "type": "string", "minLength": 1 },
+    "decisionId": { "type": "string", "minLength": 1 },
+    "selectedOption": {},
+    "approvedBy": { "type": "string", "minLength": 1 },
+    "targetArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "integer", "minimum": 1 },
+        "contentHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "evidence": {}
+  }
+}

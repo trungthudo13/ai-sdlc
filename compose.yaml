@@ -1,0 +1,52 @@
+name: ai-sdlc
+
+services:
+  postgres:
+    image: postgres:18.4
+    restart: unless-stopped
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: ${AI_SDLC_POSTGRES_USER:?AI_SDLC_POSTGRES_USER is required}
+      POSTGRES_PASSWORD: ${AI_SDLC_POSTGRES_PASSWORD:?AI_SDLC_POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${AI_SDLC_POSTGRES_DB:?AI_SDLC_POSTGRES_DB is required}
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    ports:
+      - "127.0.0.1:${AI_SDLC_POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+      - ./migrations/postgres:/migrations:ro
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+
+  qdrant:
+    image: qdrant/qdrant:v1.19.0
+    restart: unless-stopped
+    environment:
+      QDRANT__SERVICE__API_KEY: ${AI_SDLC_QDRANT_API_KEY:?AI_SDLC_QDRANT_API_KEY is required}
+    ports:
+      - "127.0.0.1:${AI_SDLC_QDRANT_HTTP_PORT:-6333}:6333"
+      - "127.0.0.1:${AI_SDLC_QDRANT_GRPC_PORT:-6334}:6334"
+    volumes:
+      - qdrant-data:/qdrant/storage
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - bash -c 'exec 3<>/dev/tcp/127.0.0.1/6333'
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  postgres-data:
+  qdrant-data:

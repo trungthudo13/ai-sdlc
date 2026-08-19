@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ai-sdlc.critic-report.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "featureId", "targetArtifact", "findings"],
+  "properties": {
+    "schema": { "const": "ai-sdlc.critic-report.v1" },
+    "featureId": { "type": "string", "minLength": 1 },
+    "targetArtifact": { "$ref": "#/definitions/artifactReference" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "severity", "type", "status"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "severity": { "enum": ["info", "low", "medium", "high", "critical"] },
+          "type": { "type": "string", "minLength": 1 },
+          "subjectRef": { "type": "string", "minLength": 1 },
+          "blocking": { "type": "boolean" },
+          "status": { "enum": ["open", "resolved", "accepted", "superseded"] },
+          "details": {}
+        }
+      }
+    }
+  },
+  "definitions": {
+    "artifactReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "integer", "minimum": 1 },
+        "contentHash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    }
+  }
+}
