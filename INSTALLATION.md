@@ -19,6 +19,7 @@ make install-tools             # chỉ cài tool còn thiếu
 make install-openclaw-plugin   # cài official @openclaw/codex plugin
 make data-up                  # chạy PostgreSQL + Qdrant, chờ healthy
 make migrate-data             # áp migrations PostgreSQL idempotently
+make provision-qdrant         # tạo/kiểm tra collection theo embedding contract
 make validate-data            # kiểm tra schema và Qdrant API
 make install-ai-sdlc-plugin   # build/test/link native AI-SDLC plugin
 make install-codex-agents      # đồng bộ custom agents vào Codex home
@@ -33,6 +34,21 @@ và quyền `0600`. File này bị Git ignore. Các biến kết nối cần cho
 đồng bộ vào khối managed trong `~/.openclaw/.env`, cũng với quyền `0600`; biến
 không thuộc bundle được giữ nguyên.
 
+Trước `make configure-openclaw` hoặc `make deploy`, điền API key hợp lệ và giữ
+nguyên embedding contract đã chốt:
+
+```dotenv
+AI_SDLC_QDRANT_EMBEDDING_MODEL=text-embedding-3-large
+AI_SDLC_QDRANT_EMBEDDING_DIMENSION=3072
+AI_SDLC_QDRANT_DISTANCE=Cosine
+AI_SDLC_OPENAI_API_KEY=sk-...
+```
+
+`AI_SDLC_OPENAI_API_KEY` là secret runtime, không commit. Model và dimension
+phải giống nhau ở lúc index tài liệu và lúc embed câu truy vấn. Nếu cần đổi một
+trong các giá trị này sau khi đã có dữ liệu, tạo snapshot/collection mới và
+re-index có chủ đích thay vì sửa collection hiện hữu.
+
 PostgreSQL dùng cổng host `55432` vì `5432` thường đã thuộc PostgreSQL khác.
 Có thể đổi port trong `.env`, nhưng phải đổi đồng thời `AI_SDLC_POSTGRES_URL`.
 Các cổng mặc định chỉ bind `127.0.0.1`. Muốn mở ra LAN cần bổ sung TLS/firewall
@@ -42,6 +58,7 @@ Quản lý data plane:
 
 ```sh
 make data-up
+make provision-qdrant
 make data-logs
 make data-down       # không xóa named volumes
 ```

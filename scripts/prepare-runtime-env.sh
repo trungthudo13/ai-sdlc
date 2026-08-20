@@ -29,6 +29,10 @@ qdrant_api_key=$(openssl rand -hex 32)
   echo "AI_SDLC_QDRANT_HTTP_PORT=6333"
   echo "AI_SDLC_QDRANT_GRPC_PORT=6334"
   echo "AI_SDLC_QDRANT_COLLECTION=ai_sdlc_knowledge"
+  echo "AI_SDLC_QDRANT_EMBEDDING_MODEL=text-embedding-3-large"
+  echo "AI_SDLC_QDRANT_EMBEDDING_DIMENSION=3072"
+  echo "AI_SDLC_QDRANT_DISTANCE=Cosine"
+  echo "AI_SDLC_OPENAI_API_KEY="
 } >"$env_file"
 
 chmod 600 "$env_file"

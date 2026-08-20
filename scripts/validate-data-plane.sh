@@ -16,7 +16,6 @@ set +a
 
 compose=(
   docker compose
-  --project-directory "$repo_root"
   --env-file "$env_file"
   -f "$repo_root/compose.yaml"
 )
@@ -35,4 +34,6 @@ qdrant_health=$(curl --fail --silent --show-error \
   "$AI_SDLC_QDRANT_URL/healthz")
 [[ -n "$qdrant_health" ]]
 
-echo "PostgreSQL migrations and Qdrant health are valid."
+"$repo_root/scripts/provision-qdrant.sh" "$repo_root" --check
+
+echo "PostgreSQL migrations, Qdrant health, and knowledge collection are valid."

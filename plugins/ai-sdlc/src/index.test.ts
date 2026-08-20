@@ -14,6 +14,7 @@ describe("ai-sdlc plugin metadata", () => {
       "ai_sdlc_decision_request_submit",
       "ai_sdlc_finding_submit",
       "ai_sdlc_gate_check",
+      "ai_sdlc_knowledge_index",
       "ai_sdlc_knowledge_search",
     ]);
     expect(metadata?.tools.every((tool) => tool.optional)).toBe(true);

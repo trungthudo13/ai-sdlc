@@ -4,7 +4,6 @@ set -euo pipefail
 repo_root=${1:?usage: migrate-postgres.sh REPO_ROOT}
 
 docker compose \
-  --project-directory "$repo_root" \
   --env-file "$repo_root/.env" \
   -f "$repo_root/compose.yaml" \
   exec -T postgres sh -ceu '

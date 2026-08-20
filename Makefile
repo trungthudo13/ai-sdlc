@@ -19,7 +19,7 @@ export PATH := $(HOME)/.local/bin:$(HOME)/.npm-global/bin:$(HOME)/.openclaw/bin:
 
 .PHONY: help status install-tools install-openclaw install-codex \
 	install-openclaw-plugin install-codex-agents install-openclaw-workspace \
-	prepare-runtime data-up data-down data-logs migrate-data validate-data \
+	prepare-runtime data-up data-down data-logs migrate-data provision-qdrant validate-data \
 	install-ai-sdlc-deps build-ai-sdlc-plugin install-ai-sdlc-plugin \
 	sync-openclaw-env configure-openclaw install-daemon start-daemon deploy \
 	validate-package validate-runtime validate
@@ -34,6 +34,7 @@ help:
 	@echo "  make data-down                Stop containers without deleting volumes"
 	@echo "  make data-logs                Follow PostgreSQL and Qdrant logs"
 	@echo "  make migrate-data             Apply idempotent PostgreSQL migrations"
+	@echo "  make provision-qdrant         Create or validate the configured knowledge collection"
 	@echo "  make install-ai-sdlc-plugin   Build and link the packaged AI-SDLC plugin"
 	@echo "  make install-codex-agents      Sync packaged agents into $(CODEX_HOME_DIR)/agents"
 	@echo "  make configure-openclaw        Merge packaged config into global OpenClaw"
@@ -77,21 +78,24 @@ install-openclaw-plugin: install-openclaw
 
 prepare-runtime:
 	@$(REPO_ROOT)/scripts/prepare-runtime-env.sh "$(REPO_ROOT)"
-	@docker compose --project-directory "$(REPO_ROOT)" --env-file "$(RUNTIME_ENV_FILE)" -f "$(COMPOSE_FILE)" config --quiet
+	@docker compose --env-file "$(RUNTIME_ENV_FILE)" -f "$(COMPOSE_FILE)" config --quiet
 
 data-up: prepare-runtime
-	@docker compose --project-directory "$(REPO_ROOT)" --env-file "$(RUNTIME_ENV_FILE)" -f "$(COMPOSE_FILE)" up -d --wait postgres qdrant
+	@docker compose --env-file "$(RUNTIME_ENV_FILE)" -f "$(COMPOSE_FILE)" up -d --wait postgres qdrant
 
 data-down:
-	@docker compose --project-directory "$(REPO_ROOT)" --env-file "$(RUNTIME_ENV_FILE)" -f "$(COMPOSE_FILE)" down
+	@docker compose --env-file "$(RUNTIME_ENV_FILE)" -f "$(COMPOSE_FILE)" down
 
 data-logs:
-	@docker compose --project-directory "$(REPO_ROOT)" --env-file "$(RUNTIME_ENV_FILE)" -f "$(COMPOSE_FILE)" logs --follow postgres qdrant
+	@docker compose --env-file "$(RUNTIME_ENV_FILE)" -f "$(COMPOSE_FILE)" logs --follow postgres qdrant
 
 migrate-data: data-up
 	@$(REPO_ROOT)/scripts/migrate-postgres.sh "$(REPO_ROOT)"
 
-validate-data: migrate-data
+provision-qdrant: data-up
+	@$(REPO_ROOT)/scripts/provision-qdrant.sh "$(REPO_ROOT)"
+
+validate-data: migrate-data provision-qdrant
 	@$(REPO_ROOT)/scripts/validate-data-plane.sh "$(REPO_ROOT)"
 
 install-ai-sdlc-deps:

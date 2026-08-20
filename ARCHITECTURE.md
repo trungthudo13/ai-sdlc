@@ -74,5 +74,7 @@ message broker tổng quát.
 
 Qdrant chỉ là derived semantic index. PostgreSQL vẫn là nguồn đúng cho quyết
 định, approval, artifact, finding và workflow event. Collection/vector index
-không được provision cho đến khi embedding model cùng vector dimension được chốt;
-điều này ngăn việc tạo một index không tương thích rồi phải rebuild âm thầm.
+được provision idempotently sau khi embedding model, vector dimension và distance
+được chốt. Collection hiện hữu sai contract làm deployment dừng; không có đường
+xóa/rebuild âm thầm. Mỗi knowledge snapshot ghi lại model, vector size, source
+manifest và content hash trong PostgreSQL trước khi workflow tham chiếu nó.

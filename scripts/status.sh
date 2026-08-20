@@ -31,7 +31,6 @@ fi
 
 if command -v docker >/dev/null 2>&1 && [[ -f "$repo_root/.env" ]]; then
   docker compose \
-    --project-directory "$repo_root" \
     --env-file "$repo_root/.env" \
     -f "$repo_root/compose.yaml" \
     ps || true

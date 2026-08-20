@@ -6,7 +6,8 @@ import { getArtifact, submitArtifact } from "./artifact-service.js";
 import { query } from "./database.js";
 import { submitDecisionRequest, submitFinding } from "./decision-service.js";
 import { evaluateGate } from "./gate-evaluator.js";
-import { qdrantHealth, searchKnowledge } from "./knowledge-tools.js";
+import { indexKnowledge, searchKnowledgeByText } from "./knowledge-service.js";
+import { qdrantHealth } from "./knowledge-tools.js";
 import { listArtifactSchemas } from "./schema-registry.js";
 import {
   attachOpenClawFlow,
@@ -57,6 +58,12 @@ export default defineToolPlugin({
             resolvedConfig.qdrantApiKey,
             context.signal,
           ),
+          embedding: {
+            model: resolvedConfig.embeddingModel,
+            dimension: resolvedConfig.embeddingDimension,
+            distance: resolvedConfig.qdrantDistance,
+            collection: resolvedConfig.knowledgeCollection,
+          },
           schemas: listArtifactSchemas(),
         };
       },
@@ -235,12 +242,42 @@ export default defineToolPlugin({
         ),
     }),
     tool({
-      name: "ai_sdlc_knowledge_search",
+      name: "ai_sdlc_knowledge_index",
       description:
-        "Search the configured Qdrant knowledge collection with a caller-supplied embedding vector.",
+        "Embed and index an immutable, explicitly identified knowledge snapshot in Qdrant and PostgreSQL.",
       parameters: Type.Object(
         {
-          vector: Type.Array(Type.Number(), { minItems: 1 }),
+          knowledgeSnapshotId: Type.String({ minLength: 1 }),
+          sourceManifest: Type.Unknown(),
+          documents: Type.Array(
+            Type.Object(
+              {
+                id: Type.String({ minLength: 1 }),
+                text: Type.String({ minLength: 1 }),
+                sourceRef: Type.String({ minLength: 1 }),
+                featureId: Type.Optional(Type.String({ minLength: 1 })),
+                metadata: Type.Optional(
+                  Type.Record(Type.String(), Type.Unknown()),
+                ),
+              },
+              { additionalProperties: false },
+            ),
+            { minItems: 1, maxItems: 100 },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+      optional: true,
+      execute: (params, config, context) =>
+        indexKnowledge(requirePluginConfig(config), params, context.signal),
+    }),
+    tool({
+      name: "ai_sdlc_knowledge_search",
+      description:
+        "Embed a text query and search the configured Qdrant knowledge collection.",
+      parameters: Type.Object(
+        {
+          query: Type.String({ minLength: 1 }),
           limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 50 })),
           featureId: Type.Optional(Type.String({ minLength: 1 })),
           knowledgeSnapshotId: Type.Optional(Type.String({ minLength: 1 })),
@@ -250,10 +287,8 @@ export default defineToolPlugin({
       optional: true,
       execute: (params, config, context) => {
         const resolvedConfig = requirePluginConfig(config);
-        return searchKnowledge(
-          resolvedConfig.qdrantUrl,
-          resolvedConfig.qdrantApiKey,
-          resolvedConfig.knowledgeCollection,
+        return searchKnowledgeByText(
+          resolvedConfig,
           { ...params, limit: params.limit ?? 10 },
           context.signal,
         );

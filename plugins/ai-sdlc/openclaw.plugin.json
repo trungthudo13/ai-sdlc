@@ -21,6 +21,46 @@
       "knowledgeCollection": {
         "type": "string",
         "minLength": 1
+      },
+      "embeddingModel": {
+        "type": "string",
+        "minLength": 1
+      },
+      "embeddingDimension": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 1
+          },
+          {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          }
+        ]
+      },
+      "qdrantDistance": {
+        "anyOf": [
+          {
+            "type": "string",
+            "const": "Cosine"
+          },
+          {
+            "type": "string",
+            "const": "Euclid"
+          },
+          {
+            "type": "string",
+            "const": "Dot"
+          },
+          {
+            "type": "string",
+            "const": "Manhattan"
+          }
+        ]
+      },
+      "openaiApiKey": {
+        "type": "string",
+        "minLength": 1
       }
     },
     "additionalProperties": false
@@ -37,6 +77,7 @@
       "ai_sdlc_decision_request_submit",
       "ai_sdlc_finding_submit",
       "ai_sdlc_gate_check",
+      "ai_sdlc_knowledge_index",
       "ai_sdlc_knowledge_search"
     ]
   },
@@ -60,6 +101,9 @@
       "optional": true
     },
     "ai_sdlc_gate_check": {
+      "optional": true
+    },
+    "ai_sdlc_knowledge_index": {
       "optional": true
     },
     "ai_sdlc_knowledge_search": {

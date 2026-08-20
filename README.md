@@ -59,5 +59,12 @@ Cổng được publish ra host nhưng chỉ bind loopback:
 - Qdrant REST/dashboard: `127.0.0.1:6333`.
 - Qdrant gRPC: `127.0.0.1:6334`.
 
-Qdrant có API key sinh ngẫu nhiên. Collection RAG chỉ nên được tạo sau khi chốt
-embedding model và vector dimension; bundle không tự đoán hai giá trị này.
+Qdrant có API key sinh ngẫu nhiên. `make provision-qdrant` tạo collection RAG
+idempotently theo model, vector dimension và distance đã chốt trong `.env`.
+Collection hiện hữu nhưng sai contract sẽ làm deploy dừng; bundle không tự xóa
+collection hoặc âm thầm rebuild vector.
+
+Plugin dùng cùng embedding contract cho cả index và query. Tài liệu được gửi qua
+`ai_sdlc_knowledge_index`; truy vấn text qua `ai_sdlc_knowledge_search` được
+embed trước khi tìm trong Qdrant. OpenAI API key chỉ nằm trong runtime `.env` và
+khối managed của `~/.openclaw/.env`, không được commit.
